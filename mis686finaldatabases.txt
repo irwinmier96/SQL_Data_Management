@@ -1,0 +1,105 @@
+#Creating the tables
+#Guests
+CREATE TABLE IF NOT EXISTS Guests(
+    GuestID INT AUTO_INCREMENT,
+    GuestLanguage VARCHAR(100) NOT NULL,
+    CountryOfOrigin VARCHAR(100),
+    VaccinatedStatus VARCHAR(100),
+    Party_Size INT,
+    PRIMARY KEY (GuestID)
+);
+
+#Rooms
+CREATE TABLE IF NOT EXISTS Rooms(
+    RoomID INT AUTO_INCREMENT,
+    RoomType VARCHAR(100) NOT NULL,
+    PRIMARY KEY (RoomID)
+);
+
+#Room Service
+CREATE TABLE IF NOT EXISTS RoomService(
+    RoomServiceType VARCHAR(100) NOT NULL,
+    Price FLOAT,
+    Description VARCHAR(300),
+    Availability VARCHAR(100),
+    PRIMARY KEY (RoomServiceType)
+);
+
+#Stay
+CREATE TABLE IF NOT EXISTS Stay(
+    StayID INT AUTO_INCREMENT,
+    GuestID INT UNIQUE,
+    RoomID INT UNIQUE,
+    LengthOfStay VARCHAR(100),
+    PRIMARY KEY (StayID),
+    FOREIGN KEY (GuestID) REFERENCES
+    Guests(GuestID),
+    FOREIGN KEY (RoomID) REFERENCES
+    Rooms(RoomID)
+);
+
+#Room Service Request
+CREATE TABLE IF NOT EXISTS RoomServiceRequest(
+    RoomServOrderID INT,
+    StayID INT,
+    RoomServiceType VARCHAR(100) NOT NULL,
+    PRIMARY KEY (RoomServOrderID),
+    FOREIGN KEY (StayID) REFERENCES
+    Stay(StayID),
+    FOREIGN KEY (RoomServiceType) REFERENCES
+    RoomService(RoomServiceType)
+);
+
+#Captain
+CREATE TABLE IF NOT EXISTS Captain(
+    CaptainID INT AUTO_INCREMENT,
+    CaptainName VARCHAR(300),
+    PrimaryCanal VARCHAR(100),
+    PRIMARY KEY (CaptainID)
+);
+
+#Rijksmuseum Tour Guide
+CREATE TABLE IF NOT EXISTS RijksmuseumTourGuide(
+    TourGuideID INT AUTO_INCREMENT,
+    HostName VARCHAR(300),
+    MuseumRole VARCHAR(100),
+    PRIMARY KEY (TourGuideID)
+);
+
+#Boats
+CREATE TABLE IF NOT EXISTS Boats(
+    ModelNumber FLOAT,
+    SeatCount INT CHECK (SeatCount<=10),
+    CaptainID INT UNIQUE,
+    PRIMARY KEY (ModelNumber),
+    FOREIGN KEY (CaptainID)
+    REFERENCES Captain(CaptainID)
+); # a captain only belongs to one boat, a boat belongs to one captain
+
+#Private Canal Tour
+CREATE TABLE IF NOT EXISTS CanalTour(
+    CanalTourID INT AUTO_INCREMENT,
+    ModelNumber FLOAT,
+    GuestID INT UNIQUE,
+    TourLengthMinutes FLOAT,
+    PRIMARY KEY (CanalTourID),
+    FOREIGN KEY (ModelNumber)
+    REFERENCES Boats(ModelNumber),
+    FOREIGN KEY (GuestID)
+    REFERENCES Guests(GuestID)
+);
+
+#Rijksmuseum Tour
+CREATE TABLE IF NOT EXISTS RijksmuseumTour(
+    TourID INT AUTO_INCREMENT,
+    MuseumTourLengthMinutes FLOAT,
+    GuestID INT UNIQUE,
+    TourGuideID INT,
+    PRIMARY KEY (TourID),
+    FOREIGN KEY (GuestID)
+    REFERENCES Guests(GuestID),
+    FOREIGN KEY (TourGuideID)
+    REFERENCES RijksmuseumTourGuide(TourGuideID)
+);
+
+

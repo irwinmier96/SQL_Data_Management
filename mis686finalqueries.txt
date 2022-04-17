@@ -1,0 +1,99 @@
+############################################
+#Final Queries MIS 686
+
+#1. Select all guests whose Country of Origin is France
+SELECT *
+FROM Guests
+WHERE CountryOfOrigin LIKE "%France%";
+/* The hotel would like to track tourism numbers coming from specific countries. */
+
+#2. Select all the fields from Guests Where the language is English and vaccinated status is  "Vaccinated"
+SELECT *
+FROM Guests 
+WHERE GuestLanguage LIKE "%English%" AND VaccinatedStatus LIKE "Vaccinated"; #some guests are partially vaccinated so those wont show up
+/* The hotel would like to track tourism numbers coming from specific countries as well as see which of their
+guests have been fully vaccinated. */
+
+#3. For guests from Spain, select GuestID, CountryofOrigin, LengthofStay from Stay, and RoomServiceType search for any of these guests who ordered Breakfast room service.
+SELECT G.GuestID, G.CountryOfOrigin, S.LengthOfStay, R.RoomServiceType
+From Guests G 
+JOIN Stay S 
+ON G.GuestID = S.GuestID
+JOIN RoomServiceRequest R 
+ON S.StayID = R.StayID
+WHERE G.CountryOfOrigin LIKE "Spain" 
+HAVING R.RoomServiceType = "Breakfast";
+/*The hotel would like to see the room service habits and preferences for their guests, and would like
+to use this data to tailor specific preferences depending on the country of origin.
+Its asking the question if the Breakfast option is popular for guests from specific countries. */
+
+#4. For all stays, count the amount of requests for a specific type of room service and add the total price for each room service type
+SELECT SUM(RS.Price), COUNT(S.StayID), RS.RoomServiceType
+FROM Stay S 
+JOIN RoomServiceRequest R 
+ON S.StayID = R.StayID
+JOIN RoomService RS
+ON R.RoomServiceType = RS.RoomServiceType
+GROUP BY RS.RoomServiceType;
+/*This will return the amount of times a room service type like Desserts were requsted, and will show
+the sum of all the requests by Room Service type
+How much revenue each room service type gets from each service is useful knowledge for a hotel. */
+
+#5. From each country of origin, count how many of them booked a tour for the Rijksmuseum i.e 3 Guests from Japan booked a private tour at the Rijksmuseum.
+SELECT COUNT(G.CountryOfOrigin), G.CountryOfOrigin
+FROM Guests G 
+JOIN RijksmuseumTour R 
+ON G.GuestID = R.GuestID
+GROUP BY G.CountryOfOrigin;
+/*The hotel wants to track the activity habits and popularity of the private tours it offers to guests */
+
+#6. For each Rijksmuseum Employee, count how many tours they are booked for, and total number of minutes for all the tours they have. Include the hosts role at the museum.
+SELECT COUNT(R.TourID), SUM(R.MuseumTourLengthMinutes), RT.HostName, RT.MuseumRole
+FROM RijksmuseumTour R 
+JOIN RijksmuseumTourGuide RT 
+ON R.TourGuideID = RT.TourGuideID
+GROUP BY RT.HostName;
+/*The hotel wants to see which tour guides are the most popular with their guests. Their role at the museum can
+mean certain parts of the museum may be more emphasized than others, meaning
+the hotel can use this information to design specialty curated tours for future guests */
+
+#7. For each Captain, count the total number of private tours for each boat, as well as the average tour length, alongside the captain name and preferred canal of the captain.
+SELECT COUNT(C.CanalTourID), AVG(C.TourLengthMinutes), B.ModelNumber, CT.CaptainName, CT.PrimaryCanal
+FROM CanalTour C
+JOIN Boats B 
+ON C.ModelNumber = B.ModelNumber
+JOIN Captain CT 
+ON B.CaptainID = CT.CaptainID
+GROUP BY CT.CaptainName;
+/*The hotel wants to track which captains have the most popularity with guests.
+Since each captain has a special canal, this could be used for special curations for future guests. */
+
+#8. For each country of origin, find out which guests booked both a musuem tour and a canal tour. Find out the room type they are staying in as well.
+SELECT COUNT(G.CountryOfOrigin), G.CountryOfOrigin, RT.TourID, C.CanalTourID,  R.RoomType
+FROM Guests G 
+JOIN RijksmuseumTour RT 
+ON G.GuestID = RT.GuestID
+JOIN CanalTour C 
+ON G.GuestID = C.CanalTourID
+JOIN Stay S 
+ON G.GuestID = S.GuestID
+JOIN Rooms R 
+ON S.RoomID = R.RoomID
+GROUP BY G.CountryOfOrigin;
+/* The hotel wants to know the frequency of bookings for both tours from certain countries. */
+
+#9. For each country of origin, count the sum and the average of the party size. Incude the amount of guests who had checked in.
+SELECT CountryOfOrigin, COUNT(GuestID),  SUM(Party_Size), AVG(Party_Size)
+FROM Guests
+GROUP BY CountryOfOrigin;
+/* The hotel can use this to gain insight as to how large a party size usually is from a specific country of origin. */
+
+#10. Count the guests who checked in by vaccinated status
+SELECT COUNT(GuestID), VaccinatedStatus 
+FROM Guests 
+GROUP By VaccinatedStatus;
+/* Due to COVID-19, its important for the hotel to track the vaccinated status of all its guests and parties.
+Current travel laws in the Netherlands require foreign travelers to be fully vaccinated or have a negative test upon arrival.
+Vaccinated means the guest who booked and their entire party is fully vaccinated.
+Partially Vaccinated Negative Test denotes the guest and party may not be fully vaccinated but all have a negative test. */
+

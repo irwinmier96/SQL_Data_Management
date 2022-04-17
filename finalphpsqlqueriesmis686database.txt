@@ -1,0 +1,40 @@
+/* PHP Search Codes */
+
+// for rijksmuseum_tours.php
+// see the tours booked with a specific length and a specific tour guide
+// see the details  of each tour that each guest has booked
+// select by guest ID must be integer
+// tour ID, host name, host specialty
+
+SELECT R.GuestID, R.MuseumTourLengthMinutes, RT.HostName, RT.MuseumRole 
+FROM rijksmuseumtour R
+JOIN rijksmuseumtourguide RT 
+ON R.TourGuideID = RT.TourGuideID
+WHERE RT.HostName LIKE "Name";
+
+// for canal_tours.php
+// search the tours by model number
+// guest id, model number, tour length minutes, seat count, captain name, preferred canal
+
+SELECT C.GuestID, C.TourLengthMinutes, CT.CaptainName, CT.PrimaryCanal
+FROM canaltour C
+JOIN boats B
+ON C.ModelNumber = B.ModelNumber
+JOIN captain CT
+ON B.CaptainID = CT.CaptainID
+WHERE B.ModelNumber LIKE "%120%" AND C.TourLengthMinutes LIKE "90";
+
+// for room_service_trends.php
+// search the place by stay id
+// stay id, room type, room service, room service description
+
+SELECT R.RoomType, RS.RoomServiceType, RO.Description, S.StayID
+FROM  stay S
+JOIN rooms R 
+ON S.RoomID = R.RoomID
+JOIN roomservicerequest RS 
+ON S.StayID = RS.StayID
+JOIN roomservice RO 
+ON RS.RoomServiceType = RO.RoomServiceType
+WHERE R.RoomType LIKE "Suite" AND RS.RoomServiceType LIKE "Dinner";
+
